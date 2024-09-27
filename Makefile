@@ -1,35 +1,31 @@
-DOCKER_COMPOSE = docker-compose
-COMPOSE_FILE = srcs/docker-compose.yml
-ENV_FILE = srcs/.env
-
 up:
-	$(DOCKER_COMPOSE) -f $(COMPOSE_FILE) up -d
+	docker-compose -f srcs/docker-compose.yml up -d
 
 down:
-	$(DOCKER_COMPOSE) -f $(COMPOSE_FILE) down
+	docker-compose -f srcs/docker-compose.yml down
 
 build:
-	$(DOCKER_COMPOSE) -f $(COMPOSE_FILE) build
+	docker-compose -f srcs/docker-compose.yml build
 
 restart: down clean build up
 
 logs:
-	$(DOCKER_COMPOSE) -f $(COMPOSE_FILE) logs
+	docker-compose -f srcs/docker-compose.yml logs
 
 clean:
-	$(DOCKER_COMPOSE) -f $(COMPOSE_FILE) down --rmi all --volumes --remove-orphans
+	docker-compose -f srcs/docker-compose.yml down --rmi all --volumes --remove-orphans
 
 ps:
-	$(DOCKER_COMPOSE) -f $(COMPOSE_FILE) ps
+	docker-compose -f srcs/docker-compose.yml ps
 
 wordpress-shell:
-	$(DOCKER_COMPOSE) -f $(COMPOSE_FILE) exec wordpress sh
+	docker-compose -f srcs/docker-compose.yml exec wordpress sh
 
 mariadb-shell:
-	$(DOCKER_COMPOSE) -f $(COMPOSE_FILE) exec mariadb sh
+	docker-compose -f srcs/docker-compose.yml exec mariadb sh
 
 nginx-shell:
-	$(DOCKER_COMPOSE) -f $(COMPOSE_FILE) exec nginx sh
+	docker-compose -f srcs/docker-compose.yml exec nginx sh
 
 help:
 	@echo "Available commands:"
