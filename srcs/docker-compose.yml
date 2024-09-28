@@ -1,48 +1,43 @@
 services:
+  nginx:
+    container_name: nginx
+    build: ./requirements/nginx
+    ports:
+      - 443:443
+    volumes:
+      - wordpress_data:/var/www/html
+    restart: on-failure
+    networks:
+      - network
 
   mariadb:
-    build: requirements/mariadb
     container_name: mariadb
-    env_file:
-      - .env
+    build: ./requirements/mariadb
     volumes:
-      - db_data:/var/lib/mysql
+      - mariadb_data:/var/lib/mysql
     networks:
       - network
-    expose:
-      - "3306"
-    restart : on-failure
+    restart: on-failure
+    env_file:
+      - .env
 
   wordpress:
-    build: requirements/wordpress
     container_name: wordpress
+    depends_on:
+      - mariadb
+    build:
+      context: ./requirements/wordpress
+      dockerfile: Dockerfile
+    restart: on-failure
     env_file:
       - .env
     volumes:
       - wordpress_data:/var/www/html
     networks:
       - network
-    depends_on:
-      - mariadb
-    expose:
-      - "9000"
-    restart : on-failure
- 
-  nginx:
-    build: requirements/nginx
-    container_name: nginx
-    volumes:
-      - wordpress_data:/var/www/html
-    networks:
-      - network
-    depends_on:
-      - wordpress
-    ports:
-      - "443:443"
-    restart : on-failure
 
 volumes:
-  db_data:
+  mariadb_data:
   wordpress_data:
 
 networks:

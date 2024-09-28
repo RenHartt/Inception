@@ -1,23 +1,35 @@
-FROM debian:bullseye
+FROM debian:buster
 
-RUN apt-get update -y && apt-get upgrade -y && apt-get install -y wget php7.4-fpm php-mysql php-phar mariadb-client
+RUN apt-get update && apt-get -y install \
+	wget \
+	curl \
+	bash \
+	php \
+	php-cgi \
+	php-mysql \
+	php-fpm \
+	php-pdo \
+	php-gd php-cli \
+	php-mbstring \
+	redis \
+	php-redis \
+	&& rm -rf /var/lib/apt/lists/*
 
-COPY conf/www.conf /etc/php/7.4/fpm/pool.d/www.conf
+RUN curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar \
+  && chmod +x wp-cli.phar \
+  && mv wp-cli.phar /usr/local/bin/wp
 
-RUN wget https://fr.wordpress.org/wordpress-6.0-fr_FR.tar.gz -P /var/www/html \
-	&& cd /var/www/html && tar -xzf wordpress-6.0-fr_FR.tar.gz && rm wordpress-6.0-fr_FR.tar.gz \
-	&& chown -R root:root /var/www/html/wordpress
+COPY ./conf/www.conf /etc/php/7.3/fpm/pool.d/
 
-RUN wget https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar \
-	&& chmod +x wp-cli.phar \
-	&& mv wp-cli.phar /usr/local/bin/wp
+RUN mkdir /run/php
 
-RUN mkdir -p /run/php \
-	&& chown -R www-data:www-data /run/php/ \
-	&& chmod 755 /run/php \
-	&& chown -R www-data:www-data /var/www/html/
+COPY ./tools/create_wordpress.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/create_wordpress.sh
 
-COPY tools/wordpress_script.sh /wordpress_script.sh
-RUN chmod +x /wordpress_script.sh
+WORKDIR /var/www/html/
 
-CMD ["/wordpress_script.sh"]
+EXPOSE 9000
+
+ENTRYPOINT ["/usr/local/bin/create_wordpress.sh"]
+
+CMD ["/usr/sbin/php-fpm7.3", "-F"]
