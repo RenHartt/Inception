@@ -2,18 +2,17 @@ FROM	debian:bullseye
 
 RUN		apt-get update
 
-RUN		apt-get install -y wget mariadb-client php7.4 php7.4-fpm php-mysql php-redis
+RUN		apt-get install -y wget mariadb-client php7.4 php7.4-fpm php-mysql
 
-RUN		mkdir -p /var/www/html
-RUN		mkdir -p /run/php
+RUN		mkdir -p /var/www/html /run/php
 
-RUN		wget https://wordpress.org/latest.tar.gz -P /var/www/html
-RUN		cd /var/www/html && tar -xzf latest.tar.gz && rm latest.tar.gz
-RUN		cd /var/www/html && mv wordpress/* . && rm -rf wordpress
-RUN		chmod -R 755 /var/www/html
+RUN		wget https://wordpress.org/latest.tar.gz -P /var/www/html \
+		&& cd /var/www/html && tar -xzf latest.tar.gz && rm latest.tar.gz \
+		&& cd /var/www/html && mv wordpress/* . && rm -rf wordpress \
+		&& chmod -R 755 /var/www/html
 
-RUN		wget https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
-RUN		chmod +x wp-cli.phar && mv wp-cli.phar /usr/local/bin/wp
+RUN		wget https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar \
+		&& chmod +x wp-cli.phar && mv wp-cli.phar /usr/local/bin/wp
 
 COPY	conf/www.conf /etc/php/7.4/fpm/pool.d
 
